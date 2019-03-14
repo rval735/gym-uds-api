@@ -38,8 +38,14 @@ class Environment(gym_uds_pb2_grpc.EnvironmentServicer):
 
     def Step(self, action_request, context):
         action_np = np.asarray(action_request.data)
-        # print(action_np)
+        
+        ##### If the environment requires an integer value
+        ##### uncomment the lines below
+        # act = int(action_np[0])
+        # observation, reward, done, _ = self.env.step(act)
+        ##### then comment the following:
         observation, reward, done, _ = self.env.step(action_np)
+        
         assert type(observation) is np.ndarray
 
         observation_pb = gym_uds_pb2.Observation(data=observation.ravel(), shape=observation.shape)
