@@ -23,6 +23,7 @@ observation_t EnvironmentClient::reset()
 
     observation_t observation;
     std::copy_n(state_reply.observation().data().cbegin(), state_reply.observation().data().size(), std::back_inserter(observation));
+    
     return observation;
 }
 
@@ -30,10 +31,16 @@ state_t EnvironmentClient::step(const action_t& action_value)
 {
     grpc::ClientContext context;
     Action action_request;
-    action_request.set_value(action_value);
+    
+    int size = action_value.size();
+    for(int i = 0; i < size; i++ ) {
+        action_request.add_data(action_value[i]);
+    }
+    
     State state_reply;
 
     grpc::Status status = stub->Step(&context, action_request, &state_reply);
+    // printf("Error: %s", status.error_message().c_str());
     assert(status.ok());
 
     observation_t observation;
@@ -50,6 +57,13 @@ action_t EnvironmentClient::sample()
 
     grpc::Status status = stub->Sample(&context, empty_request, &action_reply);
     assert(status.ok());
-    return action_reply.value();
+    
+    int size = action_reply.data_size();
+    action_t resp(size);
+    for (int i = 0; i < size; i++) {
+        resp[i] = action_reply.data(i);
+    }
+    
+    return resp;
 }
 }

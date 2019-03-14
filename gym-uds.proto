@@ -6,23 +6,20 @@ service Environment {
   rpc Sample (Empty) returns (Action) {}
 }
 
-
 message Empty {
 }
 
-
 message State {
   Observation observation = 1;
-  float reward = 2;
+  double reward = 2;
   bool done = 3;
 }
 
 message Observation {
-  repeated float data = 1;
+  repeated double data = 1;
   repeated int32 shape = 2;
 }
 
-
 message Action {
-  int32 value = 1;
+  repeated double data = 1;
 }

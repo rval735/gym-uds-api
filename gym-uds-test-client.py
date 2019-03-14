@@ -20,13 +20,13 @@ class EnvironmentClient:
         return observation
 
     def step(self, action):
-        state_pb = self.stub.Step(gym_uds_pb2.Action(value=action))
+        state_pb = self.stub.Step(gym_uds_pb2.Action(data=action))
         observation = np.asarray(state_pb.observation.data).reshape(state_pb.observation.shape)
         return observation, state_pb.reward, state_pb.done
 
     def sample(self):
         action_pb = self.stub.Sample(gym_uds_pb2.Empty())
-        return action_pb.value
+        return action_pb.data
 
 
 if __name__ == '__main__':

@@ -10,10 +10,9 @@ int main(int argc, char const* argv[])
 
     auto env = gym_uds::EnvironmentClient("unix:///tmp/gym-uds-socket");
 
-    const int num_episodes = 3;
+    const int num_episodes = 5;
     for (int episode = 1; episode <= num_episodes; ++episode) {
         gym_uds::observation_t observation = env.reset();
-
         float reward, episode_reward = 0.0f;
         bool done = false;
         while (!done) {
