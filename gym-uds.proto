@@ -11,15 +11,15 @@ message Empty {
 
 message State {
   Observation observation = 1;
-  double reward = 2;
+  float reward = 2;
   bool done = 3;
 }
 
 message Observation {
-  repeated double data = 1;
+  repeated float data = 1;
   repeated int32 shape = 2;
 }
 
 message Action {
-  repeated double data = 1;
+  repeated float data = 1;
 }

@@ -12,9 +12,9 @@
 
 namespace gym_uds
 {
-using action_t = std::vector<double>;
-using observation_t = std::vector<double>;
-using state_t = std::tuple<observation_t, double, bool>;
+using action_t = std::vector<float>;
+using observation_t = std::vector<float>;
+using state_t = std::tuple<observation_t, float, bool>;
 
 
 class EnvironmentClient
