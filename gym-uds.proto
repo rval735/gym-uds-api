@@ -13,6 +13,7 @@ message State {
   Observation observation = 1;
   float reward = 2;
   bool done = 3;
+  string envID = 4;
 }
 
 message Observation {

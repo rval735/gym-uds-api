@@ -26,6 +26,10 @@ class Environment(gym_uds_pb2_grpc.EnvironmentServicer):
         
         self.env_id = env_id
         self.env = gym.make(env_id)
+        self.actionEx = self.env.action_space.sample()
+        self.obsEx = self.env.observation_space.sample()
+        # print(self.actionEx)
+        # print(self.obsEx)
         
         ##### Uncomment below (comment above) to create an environment
         ##### that can record videos of the executions for the environment
@@ -39,39 +43,57 @@ class Environment(gym_uds_pb2_grpc.EnvironmentServicer):
             obs = np.array(float(observation))
             observation_pb = gym_uds_pb2.Observation(data=obs.ravel(), shape=obs.shape)
         
-        return gym_uds_pb2.State(observation=observation_pb, reward=0.0, done=False)
+        return gym_uds_pb2.State(observation=observation_pb, reward=0.0, done=False, envID = self.env_id)
 
     def Step(self, action_request, context):
-        action_np = np.asarray(action_request.data)
-        # print(action_np)
-        ##### If the environment requires an integer value
-        ##### uncomment the lines below
-        act = int(action_np[0])
-        observation, reward, done, _ = self.env.step(act)
-        ##### then comment the following:
-        # observation, reward, done, _ = self.env.step(action_np)
-        
-        # act = action_np.astype(int)
-        # obs, reward, done, _ = self.env.step(act[0])
-        # observation, reward, done, _ = self.env.step(act)
-        # obs, reward, done, _ = self.env.step(self.env.action_space.sample())
-        # observation = np.array(float(obs))
+        act = self.PrepareAction(action_request.data)
+        obs, reward, done, _ = self.env.step(act)
+        observation = self.PrepareObservation(obs)
         
         assert type(observation) is np.ndarray
 
         observation_pb = gym_uds_pb2.Observation(data=observation.ravel(), shape=observation.shape)
-        return gym_uds_pb2.State(observation=observation_pb, reward=reward, done=done)
+        return gym_uds_pb2.State(observation=observation_pb, reward=reward, done=done, envID = self.env_id)
 
     def Sample(self, empty_request, context):
         action = self.env.action_space.sample()
         
         if (isinstance(action, (np.ndarray, np.generic))):
             act = action.tolist()
-        else:
+        elif (isinstance(action, tuple)):
+            act = [x for x in action]
+        elif (isinstance(action, int)):
             act = [float(action)]
+        elif (isinstance(action, float)):
+            act = [action]
 
         return gym_uds_pb2.Action(data=act)
-
+        
+    def PrepareAction(self, action):
+        if (isinstance(self.actionEx, int)):
+            return int(action[0])
+        elif (isinstance(self.actionEx, (np.ndarray, np.generic))):
+            return np.asarray(action)
+        elif (isinstance(self.actionEx, tuple)):
+            tp = totuple(action)
+            return tuple(map(type(self.actionEx[0]),tp))
+        
+        return "invalid"
+    
+    def PrepareObservation(self, obs):
+        if (isinstance(self.obsEx, (np.ndarray, np.generic))):
+            return obs
+        elif (isinstance(self.obsEx, int)):
+            return np.array(float(obs))
+        elif (isinstance(self.obsEx, float)):
+            return np.array(obs)
+        
+def totuple(a):
+    try:
+        return tuple(totuple(i) for i in a)
+    except TypeError:
+        return a
+        
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('id', help='the id of the gym environment to simulate')

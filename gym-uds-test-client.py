@@ -22,7 +22,7 @@ class EnvironmentClient:
     def step(self, action):
         state_pb = self.stub.Step(gym_uds_pb2.Action(data=action))
         observation = np.asarray(state_pb.observation.data).reshape(state_pb.observation.shape)
-        return observation, state_pb.reward, state_pb.done
+        return observation, state_pb.reward, state_pb.done, state_pb.envID
 
     def sample(self):
         action_pb = self.stub.Sample(gym_uds_pb2.Empty())
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     env = EnvironmentClient(args.filepath)
-
+    envID = ""
     num_episodes = 3
     for episode in range(1, num_episodes + 1):
         observation = env.reset()
@@ -48,6 +48,6 @@ if __name__ == '__main__':
         done = False
         while not done:
             action = env.action_space.sample()
-            observation, reward, done = env.step(action)
+            observation, reward, done, envID = env.step(action)
             episode_reward += reward
-        print('Ep. %d: %.2f' % (episode, episode_reward))
+        print('Env: %s, Ep. %d: %.2f' % (envID, episode, episode_reward))
