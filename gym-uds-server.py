@@ -12,6 +12,7 @@ import gym_uds_pb2_grpc
 import numpy as np
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
+_RECORD_VALUES = False
 
 class Environment(gym_uds_pb2_grpc.EnvironmentServicer):
     def __init__(self, env_id):
@@ -24,21 +25,28 @@ class Environment(gym_uds_pb2_grpc.EnvironmentServicer):
         #     reward_threshold=-110.0,
         # )
         
+        if _RECORD_VALUES:
+        ##### Make "_RECORD_VALUES" true to create an environment
+        ##### that can record videos of the executions
+            self.env = wrappers.Monitor(gym.make(env_id), './videos/' + str(time.time()) + '/')
+        else:
+            self.env = gym.make(env_id)
+            
         self.env_id = env_id
-        self.env = gym.make(env_id)
         self.actionEx = self.env.action_space.sample()
         self.obsEx = self.env.observation_space.sample()
-        # print(self.actionEx)
-        # print(self.obsEx)
-        
-        ##### Uncomment below (comment above) to create an environment
-        ##### that can record videos of the executions for the environment
-        # self.env = wrappers.Monitor(gym.make(env_id), './videos/' + str(time.time()) + '/')
+        print(f'Observation example: {self.obsEx}, type: {type(self.obsEx)}')
+        print("Observation Space {}".format(self.env.observation_space))
+        print(f'Action Example: {self.actionEx}, type: {type(self.actionEx)}')
+        print("Action Space {}".format(self.env.action_space))
 
     def Reset(self, empty_request, context):
         observation = self.env.reset()
         if (isinstance(observation, (np.ndarray, np.generic))):
             observation_pb = gym_uds_pb2.Observation(data=observation.ravel(), shape=observation.shape)
+        if (isinstance(observation, tuple)):
+            obs = np.array(observation)
+            observation_pb = gym_uds_pb2.Observation(data=obs.ravel(), shape=obs.shape)
         else:
             obs = np.array(float(observation))
             observation_pb = gym_uds_pb2.Observation(data=obs.ravel(), shape=obs.shape)
@@ -86,6 +94,8 @@ class Environment(gym_uds_pb2_grpc.EnvironmentServicer):
         elif (isinstance(self.obsEx, int)):
             return np.array(float(obs))
         elif (isinstance(self.obsEx, float)):
+            return np.array(obs)
+        elif (isinstance(self.obsEx, tuple)):
             return np.array(obs)
         
 def totuple(a):
