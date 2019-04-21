@@ -43,8 +43,9 @@ class Environment(gym_uds_pb2_grpc.EnvironmentServicer):
     def Reset(self, empty_request, context):
         observation = self.env.reset()
         if (isinstance(observation, (np.ndarray, np.generic))):
-            observation_pb = gym_uds_pb2.Observation(data=observation.ravel(), shape=observation.shape)
-        if (isinstance(observation, tuple)):
+            print("Reset: observation")
+            observation_pb = gym_uds_pb2.Observation(data=observation.ravel(), shape=observation.shape)    
+        elif (isinstance(observation, tuple)):
             obs = np.array(observation)
             observation_pb = gym_uds_pb2.Observation(data=obs.ravel(), shape=obs.shape)
         else:
