@@ -8,37 +8,34 @@
 
 ### Install OpenAI Gym
 sudo apt update -y && sudo apt upgrade -y
-sudo apt install -y python3-dev python3-pip zlib1g-dev libjpeg-dev cmake swig python-pyglet python3-opengl libboost-all-dev libsdl2-dev libosmesa6-dev patchelf ffmpeg xvfb
-python3 -m pip3 install --upgrade pip3
-pip3 install gym
-
-### Install Protocol Buffers
-sudo apt install autoconf automake libtool curl make g++ unzip -y
-cd protobuf
-git submodule update --init --recursive
-./autogen.sh
-./configure
-make
-sudo make install
-sudo ldconfig
-cd ~
-
+sudo apt install -y python3-dev python3-pip zlib1g-dev libjpeg-dev cmake swig python-pyglet python3-opengl libboost-all-dev libsdl2-dev libosmesa6-dev patchelf ffmpeg xvfb autoconf automake libtool curl make g++ unzip
+sudo python3 -m pip install --upgrade pip
+sudo python3 -m pip install gym
 ### Install grpcio
 pip3 install grpcio --user
 pip3 install grpcio-tools --user
-sudo apt-get install build-essential autoconf libtool pkg-config -y
-git clone -b v1.20.0 https://github.com/grpc/grpc
+git clone -b $(curl -L https://grpc.io/release) https://github.com/grpc/grpc
 cd grpc
-git submodule update --init
+git submodule update --init --recursive
 make
+sudo make install
+sudo ldconfig
+### Install Protobuf
+cd third_party/protobuf/
+# ./autogen.sh
+# ./configure
+# make
 sudo make install
 sudo ldconfig
 cd ~
 
 ### Install gym-uds-api
-git clone https://github.com/rval735/gym-uds-api/l
+git clone https://github.com/rval735/gym-uds-api/
 cd gym-uds-api
 git checkout MultipleActions
+./build.sh
+cd binding-cpp/
+make
 cd ~
 
 ### install Zweifel library
