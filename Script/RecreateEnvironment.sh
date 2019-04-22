@@ -38,6 +38,10 @@ cd binding-cpp/
 make
 cd ~
 
+### NOTE!! If the compiler complains when trying to copile the
+### c++ example (gym-uds-client), use the MakeFile that is located
+### on the "src" folder to create all files: headers, pn and binary
+
 ### install Zweifel library
 git clone https://github.com/zweifel/zweifel.git
 cd zweifel/src
@@ -48,3 +52,5 @@ cd ~
 
 ### install BiSUNA
 git clone git@bitbucket.org:rval735/suna.git
+cd suna
+make
