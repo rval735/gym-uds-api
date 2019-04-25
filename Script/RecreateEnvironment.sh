@@ -11,6 +11,10 @@ sudo apt update -y && sudo apt upgrade -y
 sudo apt install -y python3-dev python3-pip zlib1g-dev libjpeg-dev cmake swig python-pyglet python3-opengl libboost-all-dev libsdl2-dev libosmesa6-dev patchelf ffmpeg xvfb autoconf automake libtool curl make g++ unzip
 sudo python3 -m pip install --upgrade pip
 sudo python3 -m pip install gym
+# if results are going to be copied to S3:
+# sudo apt-get -y install s3cmd
+# s3cmd --configure
+# s3cmd put LOGFILE.txt s3://S3BUCKET/
 ### Install grpcio
 pip3 install grpcio --user
 pip3 install grpcio-tools --user
