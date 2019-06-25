@@ -6,6 +6,7 @@ from concurrent import futures
 
 import grpc
 import gym
+#import roboschool
 from gym import wrappers
 import gym_uds_pb2
 import gym_uds_pb2_grpc
@@ -33,8 +34,10 @@ class Environment(gym_uds_pb2_grpc.EnvironmentServicer):
             self.env = gym.make(env_id)
             
         self.env_id = env_id
+        print(f'EnvID: {self.env_id}')
         self.actionEx = self.env.action_space.sample()
-        self.obsEx = self.env.observation_space.sample()
+        #self.obsEx = self.env.observation_space.sample()
+        self.obsEx = self.env.reset()
         print(f'Observation example: {self.obsEx}, type: {type(self.obsEx)}')
         print("Observation Space {}".format(self.env.observation_space))
         print(f'Action Example: {self.actionEx}, type: {type(self.actionEx)}')
@@ -43,7 +46,7 @@ class Environment(gym_uds_pb2_grpc.EnvironmentServicer):
     def Reset(self, empty_request, context):
         observation = self.env.reset()
         if (isinstance(observation, (np.ndarray, np.generic))):
-            observation_pb = gym_uds_pb2.Observation(data=observation.ravel(), shape=observation.shape)    
+            observation_pb = gym_uds_pb2.Observation(data=observation.ravel(), shape=observation.shape)
         elif (isinstance(observation, tuple)):
             obs = np.array(observation)
             observation_pb = gym_uds_pb2.Observation(data=obs.ravel(), shape=obs.shape)
